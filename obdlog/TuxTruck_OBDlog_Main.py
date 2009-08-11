@@ -1,6 +1,6 @@
 # TuxTruck_OBDlog_Main.py
 #
-# Time-stamp: "2009-08-11 10:37:40 jantman"
+# Time-stamp: "2009-08-11 18:42:48 jantman"
 #
 # +----------------------------------------------------------------------+
 # | TuxTruck Project      http://tuxtruck.jasonantman.com                |
@@ -33,7 +33,7 @@
 # +----------------------------------------------------------------------+
 #
 
-import Queue, threading, datetime, os.path
+import Queue, threading, datetime, os.path, time
 from datetime import datetime
 from TuxTruck_OBDlog_SunSPOT_Reader import TuxTruck_OBDlog_SunSPOT_Reader
 from util.TuxTruck_Thread_Queue import TuxTruck_Thread_Queue
@@ -48,8 +48,10 @@ class TuxTruck_OBDlog_Main():
     # CONFIGURATION
     #
     ELMSCAN_PORT = "/dev/ttyS0" # path to the serial port for the ElmScan
-    SUNSPOT_PORT = "/dev/ttyACM0" # path to the SunSPOT
-    DATA_INTERVAL = 2.0 # interval at which to collect data, in seconds (float)
+    #SUNSPOT_PORT = "/dev/ttyACM0" # path to the SunSPOT
+    SUNSPOT_PORT = "/tmp/accelfifo" # path to the SunSPOT # DEBUG
+    LCD_PORT = "/dev/ttyUSB0" # path to the LCD display
+    DATA_INTERVAL = 0.5 # interval at which to collect data, in seconds (float)
     DATA_FILE_NAME = "" # what to call the data file
     DATA_FILE_PATH = "/home/jantman/" # where to put the data file
 
@@ -57,11 +59,15 @@ class TuxTruck_OBDlog_Main():
     gpsQueue = None # queue for the GPSd data
     obdQueue = None # queue for the OBD data
     accelQueue = None # queue for the accelerometer (SunSPOT) data
+    lcdQueue = None # queue going to LCD
 
     # data source objects
     gps = None # the TuxTruck_OBDlog_gpsd object
     obd = None # the TuxTruck_OBDlog_obd object
     accel = None # the TuxTruck_OBDlog_accel object
+
+    # output objects
+    lcd = None # the CrystalFontz LCD thread
 
     def __init__(self, parent):
         """
@@ -85,20 +91,47 @@ class TuxTruck_OBDlog_Main():
 
         # intialize SunSPOT
         self.accelQueue = TuxTruck_Thread_Queue(3)
-        self.accel = TuxTruck_OBDlog_SunSPOT_Reader(self, self.accelQueue)
+        self.accel = TuxTruck_OBDlog_SunSPOT_Reader(self, self.accelQueue, self.SUNSPOT_PORT)
 
+        # initialize the GPS
+        self.gpsQueue = TuxTruck_Thread_Queue(3)
+
+        # initialize the OBD reader
+        self.obdQueue = TuxTruck_Thread_Queue(3)
+
+        # initialize the LCD
+        self.lcdQueue = TuxTruck_Thread_Queue(3)
+        self.lcd = TuxTruck_OBDlog_LCD(self, self.lcdQueue, self.LCD_PORT)
+        
 
     def run(self):
         """
         Once init is finished, start logging...
         """
-        # start the gps thread
-        # start the obd thread
-        
+
+        DATA_FILE = open(self.DATA_FILE_PATH + "/" + self.DATA_FILE_NAME, "w")
+
         # start the accel thread
         self.accel.start()
 
-        # every self.DATA_INTERVAL seconds, write the data to the data sink
-        while 1:
-            print self.accelQueue.pop()
+        # start the gps thread
+        # start the obd thread
+        # start the lcd thread
+        self.lcd.start()
 
+        # every self.DATA_INTERVAL seconds, write the data to the data sink
+        while True:
+            a = None
+            g = None
+            o = None
+            while a == None or g == None or o == None:
+                  if a == None:
+                      a = self.accelQueue.pop()
+                  if g == None:
+                      g = self.gpsQueue.pop()
+                  if o == None:
+                      o = self.obdQueue.pop()
+            DATA_FILE.write(a + "," + g + "," + o)
+            print "Accel=" + a + "\nGPS=" + g + "\nOBD=" + o + "\n=========\n" # DEBUG
+            self.lcdQueue.append(a + "," + g + "," + o)
+            time.sleep(self.DATA_INTERVAL)

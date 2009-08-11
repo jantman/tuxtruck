@@ -1,6 +1,6 @@
-# TuxTruck_OBDlog_SunSPOT_Reader.py
+# TuxTruck_OBDlog_LCD.py
 #
-# Time-stamp: "2009-08-11 18:41:51 jantman"
+# Time-stamp: "2009-08-11 18:52:39 jantman"
 #
 # +----------------------------------------------------------------------+
 # | TuxTruck Project      http://tuxtruck.jasonantman.com                |
@@ -32,33 +32,37 @@
 # | $HeadURL:: http://svn.jasonantman.com/tuxtruck/obdlog/shell.py     $ |
 # +----------------------------------------------------------------------+
 
-import threading
-import time
+import Queue, threading, time
+from util.crystalfontz635usb import crystalfontz635usb as CF635USB
 
-class TuxTruck_OBDlog_SunSPOT_Reader(threading.Thread):
+class TuxTruck_OBDlog_LCD(threading.Thread):
     """
-    Class to read the output of the SunSPOT accelerometer
-
+    Control output to an LCD display.
     """
 
     PORT = ""
-    FILE = None
-    Q = ""
+    Q = None
+    DISPLAY = None
 
     def __init__(self, parent, q, port):
         """
-        Open the port, start reading and buffering.
+        Perform preliminary init of all child classes, DB, etc.
         """
         self.PORT = port
         self.Q = q
         threading.Thread.__init__(self)
-        
-    def run(self):
+
+    def run():
         """
-        Start thread...
+        Start the thread.
         """
-        self.FILE = open(self.PORT, "r")
+        self.DISPLAY = CF635USB(None, self.PORT)
+
         while True:
-            line = self.FILE.readline()
-            self.Q.append(line)
-            time.sleep(0.1)
+            if len(self.Q) > 0:
+                foo = self.Q.pop()
+                # explode, write to LCD
+                # self.DISPLAY.writeLineFromLeft(num, text)
+                # time.sleep(display.WAIT_TIME)
+            else:
+                time.sleep(0.1)
