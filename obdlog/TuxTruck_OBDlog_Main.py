@@ -1,6 +1,6 @@
 # TuxTruck_OBDlog_Main.py
 #
-# Time-stamp: "2009-08-10 17:27:16 jantman"
+# Time-stamp: "2009-08-11 10:37:40 jantman"
 #
 # +----------------------------------------------------------------------+
 # | TuxTruck Project      http://tuxtruck.jasonantman.com                |
@@ -35,6 +35,8 @@
 
 import Queue, threading, datetime, os.path
 from datetime import datetime
+from TuxTruck_OBDlog_SunSPOT_Reader import TuxTruck_OBDlog_SunSPOT_Reader
+from util.TuxTruck_Thread_Queue import TuxTruck_Thread_Queue
 
 class TuxTruck_OBDlog_Main():
     """
@@ -81,6 +83,10 @@ class TuxTruck_OBDlog_Main():
         if self.DATA_FILE_PATH == "":
             self.DATA_FILE_PATH = os.path.expanduser("~")
 
+        # intialize SunSPOT
+        self.accelQueue = TuxTruck_Thread_Queue(3)
+        self.accel = TuxTruck_OBDlog_SunSPOT_Reader(self, self.accelQueue)
+
 
     def run(self):
         """
@@ -89,4 +95,10 @@ class TuxTruck_OBDlog_Main():
         # start the gps thread
         # start the obd thread
         
+        # start the accel thread
+        self.accel.start()
+
         # every self.DATA_INTERVAL seconds, write the data to the data sink
+        while 1:
+            print self.accelQueue.pop()
+
