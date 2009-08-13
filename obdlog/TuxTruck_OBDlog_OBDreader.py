@@ -1,6 +1,6 @@
-# TuxTruck_OBDlog_LCD.py
+# TuxTruck_OBDlog_OBDreader.py
 #
-# Time-stamp: "2009-08-13 01:48:04 jantman"
+# Time-stamp: "2009-08-13 00:56:20 jantman"
 #
 # +----------------------------------------------------------------------+
 # | TuxTruck Project      http://tuxtruck.jasonantman.com                |
@@ -32,53 +32,34 @@
 # | $HeadURL:: http://svn.jasonantman.com/tuxtruck/obdlog/shell.py     $ |
 # +----------------------------------------------------------------------+
 
-import Queue, threading, time
-from util.crystalfontz635usb import crystalfontz635usb as CF635USB
+import threading
+import time
 
-class TuxTruck_OBDlog_LCD(threading.Thread):
+class TuxTruck_OBDlog_OBDreader(threading.Thread):
     """
-    Control output to an LCD display.
+    Class to read the output of the ElmScan5 OBD reader
+
     """
 
     PORT = ""
-    Q = None
-    DISPLAY = None
+    Q = ""
     PARENT = None
 
     def __init__(self, parent, q, port):
         """
-        Perform preliminary init of all child classes, DB, etc.
+        Open the port, start reading and buffering.
         """
         self.PORT = port
         self.Q = q
         self.PARENT = parent
         threading.Thread.__init__(self)
-        self.DISPLAY = CF635USB(None, self.PORT)
-        self.DISPLAY.clearScreen()
-
+        
     def run(self):
         """
-        Start the thread.
+        Start thread...
         """
         while True and self.PARENT.KILLED == False:
-            if len(self.Q) > 0:
-                # "Accel",accel,accelX,accelY,accelZ,tiltX,tiltY,tiltZ,"GPS",lat,long,heading,speed,"OBD",MAF,VSS,LOAD,FuelPress,ManifoldPress,RPM
-                foo = self.Q.pop()
-                # explode, write to LCD
-                bar = foo.split(",")
-
-                t = time.strftime("%H:%M:%S", time.localtime())
-                self.DISPLAY.writeLineFromLeft(0, t)
-                time.sleep(self.DISPLAY.WAIT_TIME)
-
-                self.DISPLAY.writeSplitLine(1, bar[11], bar[12])
-                time.sleep(self.DISPLAY.WAIT_TIME)
-
-                self.DISPLAY.writeSplitLine(2, bar[15], bar[19])
-                time.sleep(self.DISPLAY.WAIT_TIME)
-
-                self.DISPLAY.writeLineFromLeft(3, "MPG: ") # TODO - calculate MPG
-                time.sleep(self.DISPLAY.WAIT_TIME)
-
-            else:
-                time.sleep(0.1)
+            # "OBD",MAF,VSS,LOAD,FuelPress,ManifoldPress,RPM
+            line = "OBD,MAF,VSS,LOAD,FuelPress,ManifoldPress,RPM"
+            self.Q.append(line)
+            time.sleep(0.1)

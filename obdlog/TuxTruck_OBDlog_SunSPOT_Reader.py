@@ -1,6 +1,6 @@
 # TuxTruck_OBDlog_SunSPOT_Reader.py
 #
-# Time-stamp: "2009-08-11 18:41:51 jantman"
+# Time-stamp: "2009-08-13 00:57:27 jantman"
 #
 # +----------------------------------------------------------------------+
 # | TuxTruck Project      http://tuxtruck.jasonantman.com                |
@@ -44,6 +44,7 @@ class TuxTruck_OBDlog_SunSPOT_Reader(threading.Thread):
     PORT = ""
     FILE = None
     Q = ""
+    PARENT = None
 
     def __init__(self, parent, q, port):
         """
@@ -51,6 +52,7 @@ class TuxTruck_OBDlog_SunSPOT_Reader(threading.Thread):
         """
         self.PORT = port
         self.Q = q
+        self.PARENT = parent
         threading.Thread.__init__(self)
         
     def run(self):
@@ -58,7 +60,8 @@ class TuxTruck_OBDlog_SunSPOT_Reader(threading.Thread):
         Start thread...
         """
         self.FILE = open(self.PORT, "r")
-        while True:
+        while True and self.PARENT.KILLED == False:
             line = self.FILE.readline()
+            # "Accel",accel,accelX,accelY,accelZ,tiltX,tiltY,tiltZ
             self.Q.append(line)
             time.sleep(0.1)

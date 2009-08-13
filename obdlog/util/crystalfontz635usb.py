@@ -1,5 +1,5 @@
 # crystalfontz635usb.py Version 1.0
-# Time-stamp: "2008-08-11 18:10:50 jantman"
+# Time-stamp: "2009-08-13 01:35:17 jantman"
 # $Id: crystalfontz635usb.py,v 1.1 2009/03/29 05:30:51 jantman Exp $
 # Class to control the CrystalFontz 635 USB display
 
@@ -139,19 +139,34 @@ class crystalfontz635usb:
 
     def writeLineFromLeft(self, lineNum, text):
 	"""
-	This function writes a line of text (param text) on the screen, on the line specified by lineNum. The text should be a string, maximum length of 20 chracters. If you want it centered, you should pad it yourself. lineNum should be an integer from 1 to 4.
+	This function writes a line of text (param text) on the screen, on the line specified by lineNum. The text should be a string, maximum length of 20 chracters. If you want it centered, you should pad it yourself. lineNum should be an integer from 0 to 3.
         @param lineNum (int) - the line number, 0 to 3
         @param text (string) - the text to write (max len 20)
 	"""
-        self.sendCommand(0x1F, chr(0)+chr(lineNum)+text)
+        self.sendCommand(0x1F, chr(0)+chr(lineNum)+string.ljust(text, 20))
 
     def writeCenteredLine(self, lineNum, text):
         """
-        This function writes a line of text (param text), with the text centered on the line (line number specified by lineNum). The text should be a string, maximum length of 20 chracters. lineNum should be an integer from 1 to 4.
+        This function writes a line of text (param text), with the text centered on the line (line number specified by lineNum). The text should be a string, maximum length of 20 chracters. lineNum should be an integer from 0 to 3.
         @param lineNum (int) - the line number, 0 to 3
         @param text (string) - the text to write (max len 20)
         """
         self.writeLineFromLeft(lineNum, string.center(text, 20))
+
+    def writeSplitLine(self, lineNum, leftText, rightText):
+        """
+        This function writes a line of text with the two text elements left and right justified, respectively, on the line (line number specified by lineNum). The text should be a string, maximum length of 20 chracters. lineNum should be an integer from 0 to 3.
+        @param lineNum (int) - the line number, 0 to 3
+        @param leftText (string) - text to left justify
+        @param rightText (string) - text to right justify
+        """
+        foo = len(leftText) + len(rightText)
+        if foo >= 20:
+            bar = leftText + "|" + rightText
+        else:
+            baz = " " * (20 - foo)
+            bar = leftText + baz + rightText
+        self.writeLineFromLeft(lineNum, bar)
 	    
     def clearAllLEDs(self):
         """

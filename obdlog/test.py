@@ -1,57 +1,21 @@
 #!/usr/bin/env python
+import time
+from util.crystalfontz635usb import crystalfontz635usb as CF635USB
+DISPLAY = CF635USB(None, "/dev/ttyUSB0")
 
-"""
-import threading
-import datetime
-        
-class ThreadClass(threading.Thread):
-    def run(self):
-        now = datetime.datetime.now()
-        print "%s says Hello World at time: %s" % (self.getName(), now)
-        
-for i in range(2):
-    t = ThreadClass()
-    t.start()
-"""
+DISPLAY.clearScreen()
+time.sleep(DISPLAY.WAIT_TIME)
 
-import collections
+DISPLAY.setContrast(95)
+time.sleep(DISPLAY.WAIT_TIME)
+DISPLAY.setBacklight(50)
+time.sleep(DISPLAY.WAIT_TIME)
 
-q = collections.deque(maxlen=3)
-print q
+DISPLAY.writeSplitLine(0, "12345", "678")
+time.sleep(DISPLAY.WAIT_TIME)
 
-q.appendleft("ONE")
-print q
-q.appendleft("TWO")
-print q
-q.appendleft("THREE")
-print q
-q.appendleft("FOUR")
-print q
+DISPLAY.writeLineFromLeft(3, "FOOBARBAZ")
+time.sleep(DISPLAY.WAIT_TIME)
 
-print q.popleft()
-print q
-print q.popleft()
-print q
-print q.popleft()
-print q
-
-print "======================\n"
-
-q = collections.deque(maxlen=3)
-print q
-
-q.append("ONE")
-print q
-q.append("TWO")
-print q
-q.append("THREE")
-print q
-q.append("FOUR")
-print q
-
-print q.pop()
-print q
-print q.pop()
-print q
-print q.pop()
-print q
+DISPLAY.clearLED(2)
+time.sleep(DISPLAY.WAIT_TIME)
