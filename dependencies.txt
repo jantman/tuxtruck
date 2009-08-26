@@ -1,0 +1,13 @@
+TuxTruck Dependencies:
+
+Hardware/Other Software:	       
+	OBDlog:
+		GPSd (and GPS hardware)
+		SunSPOT with SunSPOT AccelerometerReader app, connected to /dev/ttyACM0
+	
+Python 2.6+
+
+Python Modules:
+       dbus
+       serial
+

@@ -28,8 +28,8 @@
 # +----------------------------------------------------------------------+
 # | Authors: Jason Antman <jason@jasonantman.com>                        |
 # +----------------------------------------------------------------------+
-# | $LastChangedRevision:: 5                                           $ |
-# | $HeadURL:: http://svn.jasonantman.com/tuxtruck/obdlog/shell.py     $ |
+# | $LastChangedRevision::                                             $ |
+# | $HeadURL::                                                         $ |
 # +----------------------------------------------------------------------+
 
 import Queue, threading, time

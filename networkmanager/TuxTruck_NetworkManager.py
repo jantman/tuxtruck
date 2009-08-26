@@ -1,6 +1,6 @@
-# TuxTruck_OBDlog_OBDreader.py
+# TuxTruck_NetworkManager.py
 #
-# Time-stamp: "2009-08-13 00:56:20 jantman"
+# Time-stamp: "2009-08-26 08:59:30 jantman"
 #
 # +----------------------------------------------------------------------+
 # | TuxTruck Project      http://tuxtruck.jasonantman.com                |
@@ -32,34 +32,32 @@
 # | $HeadURL::                                                         $ |
 # +----------------------------------------------------------------------+
 
-import threading
+import dbus
 import time
 
-class TuxTruck_OBDlog_OBDreader(threading.Thread):
+class TuxTruck_NetworkManager():
     """
-    Class to read the output of the ElmScan5 OBD reader
-
+    Class to perform DBUS-based cotrol of NetworkManager.
     """
 
-    PORT = ""
-    Q = ""
     PARENT = None
+    BUS = None
+    NM = None
 
-    def __init__(self, parent, q, port):
+    def __init__(self, parent):
         """
-        Open the port, start reading and buffering.
+        Get the DBUS object and initialize things.
         """
-        self.PORT = port
-        self.Q = q
         self.PARENT = parent
-        threading.Thread.__init__(self)
+        self.BUS = dbus.SystemBus()
+        self.NM = self.BUS.get_object('org.freedesktop.NetworkManager', '/org/freedesktop/NetworkManager')
         
     def run(self):
         """
-        Start thread...
+        DO the shit.
         """
-        while True and self.PARENT.KILLED == False:
-            # "OBD",MAF,VSS,LOAD,FuelPress,ManifoldPress,RPM
-            line = "OBD,MAF,VSS,LOAD,FuelPress,ManifoldPress,RPM"
-            self.Q.append(line)
-            time.sleep(0.1)
+        print "run()"
+        print "STATE:"
+        print self.NM.state()
+        print "ACTIVE CONNECTIONS:"
+        print self.NM.GetActiveConnections()

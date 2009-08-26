@@ -1,6 +1,6 @@
 # crystalfontz635usb.py Version 1.0
 # Time-stamp: "2009-08-13 01:35:17 jantman"
-# $Id: crystalfontz635usb.py,v 1.1 2009/03/29 05:30:51 jantman Exp $
+# $Id$
 # Class to control the CrystalFontz 635 USB display
 
 # Copyright 2008 Jason Antman <http://www.jasonantman.com> <jason@jasonantman.com>
