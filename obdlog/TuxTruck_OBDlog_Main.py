@@ -1,6 +1,6 @@
 # TuxTruck_OBDlog_Main.py
 #
-# Time-stamp: "2009-08-13 00:58:22 jantman"
+# Time-stamp: "2009-08-13 10:20:32 jantman"
 #
 # +----------------------------------------------------------------------+
 # | TuxTruck Project      http://tuxtruck.jasonantman.com                |
@@ -109,7 +109,10 @@ class TuxTruck_OBDlog_Main():
 
         # initialize the LCD
         self.lcdQueue = TuxTruck_Thread_Queue(3)
-        self.lcd = TuxTruck_OBDlog_LCD(self, self.lcdQueue, self.LCD_PORT)
+        if os.path.exists(self.LCD_PORT) and os.access(self.LCD_PORT, os.W_OK):
+            self.lcd = TuxTruck_OBDlog_LCD(self, self.lcdQueue, self.LCD_PORT)
+        else:
+            print "LCD Port " + self.LCD_PORT + " does not exist or is not writable."
         
 
     def run(self):
@@ -123,7 +126,8 @@ class TuxTruck_OBDlog_Main():
         self.gps.start()
         self.obd.start()
 
-        self.lcd.start()
+        if self.lcd != None:
+            self.lcd.start()
 
         # every self.DATA_INTERVAL seconds, write the data to the data sink
         while True:
