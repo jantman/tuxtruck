@@ -6,5 +6,6 @@ platform. There's very little code here - some stuff for reading OBD and GPS
 data, and strangely, code for reading the accelerometer information from
 SunSPOTs. 
 
-What I *do* have is an idea, and a domain name - tuxtruck.org. If anyone is
-interested in continuing the project, please contact me.
+If you're looking for the later, wxPython version of TuxTruck (referenced on
+tuxtruck.org), you're probably looking for my [TuxTruck-wxPython repository](https://github.com/jantman/TuxTruck-wxPython).
+
